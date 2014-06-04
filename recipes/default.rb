@@ -21,16 +21,20 @@ include_recipe "build-essential"
 
 node[:dotmatrix][:users].each do |user|
   home = File.expand_path("~#{user}")
+  environ = { "HOME" => home, "TERM" => "ansi" }
   git "#{home}/dotmatrix" do
+    user "vagrant"
+    group "vagrant"
     repository  'git://github.com/hashrocket/dotmatrix'
     action :sync
   end
-
+  
+  
   bash "install_dotmatrix" do
     cwd "#{home}/dotmatrix"
     user "vagrant"
     group "vagrant"
-    environment "HOME" => "/home/vagrant"
+    environment( environ )
     code "bin/install"
   end
 
@@ -38,7 +42,7 @@ node[:dotmatrix][:users].each do |user|
     cwd "#{home}/dotmatrix"
     user "vagrant"
     group "vagrant"
-    environment "HOME" => home
+    environment( environ )
     code "bin/vimbundles.sh"
   end
 end
